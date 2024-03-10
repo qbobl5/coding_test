@@ -5,26 +5,37 @@ Comparator 활용을 통해 커스텀 정렬을 하는 것은 유용하다.
 ***
   
 1. Arrays.sort()로 커스텀 정렬을 하는 경우
-  임의의 배열 (기본형 X) 혹은 다차원 배열 등을 정렬하는 경우 쓸 수 있다.
+임의의 배열 (기본형 X) 혹은 다차원 배열 등을 정렬하는 경우 쓸 수 있다.
   
   [예시 코드]
   People[] people=new People[100]; // People이라는 임의의 class가 존재한다고 가정
   people=...;
   Arrays.sort(people, new Comparator<People>() {
-    @Override
-    public int compare(People p1, People p2) {
-      return p1.age - p2.age;
-    }
+      @Override
+      public int compare(People p1, People p2) {
+        	return p1.age - p2.age;
+      }
+  });
+  
+  String[] str={...};
+  Arrays.sort(str, new Comparator<String>() {
+  	@Override
+      public int compare(String s1, String s2) {
+      	  return s1.compareTo(s2);
+      }
   });
 
+참고로 Comparator<String>의 경우, compareTo()를 이용하여 사전순 정렬을 할 수 있는데,
+return s1.length() - s2.length(); 같은 경우도 가능하다.
+
+
 2. List.sort()로 커스텀 정렬을 하는 경우
-  List를 정렬할 수 있다.
+List를 정렬할 수 있다.
 
   [예시 코드]
-  List<Integer>형의 people이 존재한다고 가정
-  people.sort(new Comparator<Integer>(){
+  people.sort(new Comparator<Integer>(){ // List<Integer>형의 people이 존재한다고 가정
     @Override
-    public int compare(Integer i1, Integer i2) {
-      return i2 - i1;
-    }
+      public int compare(Integer i1, Integer i2) {
+        	return i2 - i1;
+      }
   });
