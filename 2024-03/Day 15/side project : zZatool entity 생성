@@ -1,0 +1,6 @@
+내가 맡은 부분
+
+1. package 생성 : test, result
+2. entity 생성 : 
+   1) test > test, quiz, view, comment
+   2) result > result, resultView
