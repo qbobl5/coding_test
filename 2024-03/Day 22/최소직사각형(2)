@@ -1,0 +1,30 @@
+import java.util.*;
+class Solution {
+      public int solution(int[][] sizes) {
+            Arrays.sort(sizes, new Comparator<int[]>(){
+                  @Override
+                  public int compare(int[] i1, int[] i2) {
+                        if(i1[0]<i1[1]) {
+                              int tmp=i1[1];
+                              i1[1]=i1[0];
+                              i1[0]=tmp;
+                        }
+                        if(i2[0]<i2[1]) {
+                              int tmp=i2[1];
+                              i2[1]=i2[0];
+                              i2[0]=tmp;
+                        }
+                        return i2[0] - i1[0];
+                  }
+            });
+            int w=sizes[0][0];
+            Arrays.sort(sizes, new Comparator<int[]>(){
+                  @Override
+                  public int compare(int[] i1, int[] i2) {
+                        return i2[1] - i1[1];
+                  }
+            });
+            
+            return w*sizes[0][1];
+      }
+}
