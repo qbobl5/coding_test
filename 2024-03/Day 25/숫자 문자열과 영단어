@@ -1,0 +1,60 @@
+class Solution {
+    public static String chk(String s) {
+        try {
+            int i=Integer.parseInt(s);
+            return s;
+        } catch(Exception e) {
+            return "";
+        }
+    }
+    
+    public static String chg(String s) {
+        switch(s) {
+            case "zero":
+                return "0";
+            case "one":
+                return "1";
+            case "two":
+                return "2";
+            case "three":
+                return "3";
+            case "four":
+                return "4";
+            case "five":
+                return "5";
+            case "six":
+                return "6";
+            case "seven":
+                return "7";
+            case "eight":
+                return "8";
+            case "nine":
+                return "9";
+            default:
+                return "";
+        }
+    }
+    
+    public int solution(String s) {
+        String[] strArr=s.split("");
+        String tmp="";
+        String result="";
+        
+        for(String str:strArr) {
+            if(chk(str).equals("")) {
+                tmp+=str;
+                String chgStr=chg(tmp);
+                if(!chgStr.equals("")) {
+                    result+=chgStr;
+                    tmp="";
+                }
+            } else {
+                result+=chg(tmp);
+                result+=str;
+                tmp="";
+            }
+        }
+        
+        return Integer.parseInt(result);
+    }
+}
