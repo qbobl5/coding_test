@@ -1,0 +1,13 @@
+📌 마이페이지
+1. 회원이 푼 테스트 목록 조회
+2. 회원이 만든 테스트 목록 조회
+
+➤ 회원이 푼 테스트 목록 조회
+  - resultDTO 추가
+  - resultRepository 추가
+    + Page<>를 example, pageable로 받아올 수 있는 지 알아보기
+  - resultService 추가
+  - resultController 추가
+
+➤ 마이페이지 조회
+  - typeScript로 프론트 구현
