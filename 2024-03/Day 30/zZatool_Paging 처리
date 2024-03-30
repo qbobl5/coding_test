@@ -1,0 +1,123 @@
+1. Repository → pageable 활용하여 List<Result>로 받기
+
+package com.timekiller.zzatool.result.dao;
+
+import com.timekiller.zzatool.result.entity.Result;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface ResultRepository extends JpaRepository<Result, Long> {
+	 /**
+		* memberId에 해당하는 결과 목록을resultDate desc로 정렬하여pageable만큼 조회
+		*
+		* @parammemberId회원 아이디
+		* @parampageable페이지
+		* @return결과 목록
+	  */
+		List<Result> findByMemberIdOrderByResultDateDesc(Long memberId, Pageable pageable);
+}
+
+***
+
+2. Service 수정
+package com.timekiller.zzatool.result.service;
+
+import com.timekiller.zzatool.result.dao.ResultRepository;
+import com.timekiller.zzatool.result.dto.ResultDTO;
+import com.timekiller.zzatool.result.entity.Result;
+import com.timekiller.zzatool.test.dao.TestRepository;
+import com.timekiller.zzatool.test.service.TestServiceImpl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
+@Service
+public class ResultServiceImpl implements ResultService {
+    private static final Loggerlogger= Logger.getLogger(TestServiceImpl.class.getName());
+    @Autowired private ResultRepository resultRepository;
+    @Autowired private TestRepository testRepository;
+
+		/* SELECT :회원이 푼 테스트 목록 조회 */
+		@Override
+		public Page<ResultDTO> findResultListByMemberId(Long memberId, Pageable pageable) {
+        List<Result> resultList =
+                resultRepository.findByMemberIdOrderByResultDateDesc(memberId, pageable);
+
+        List<ResultDTO> resultDTOList = new ArrayList<>();
+        for (Result result : resultList) {
+            String testTitle = findTestTitle(result.getTestId());
+            resultDTOList.add(resultEntityToDTO(result, testTitle));
+        }
+
+        Result exampleResult = Result.builder().memberId(memberId).build();
+        ExampleMatcher exampleMatcher = ExampleMatcher.matchingAll();
+        Example<Result> example = Example.of(exampleResult, exampleMatcher);
+        Long cnt = resultRepository.count(example);
+
+        return new PageImpl<>(resultDTOList, pageable, cnt);
+    }
+
+		/* method :결과 entity를 dto로 변환 */
+		private ResultDTO resultEntityToDTO(Result result, String testTitle) {
+        return ResultDTO.builder()
+                .resultId(result.getResultId())
+                .testId(result.getTestId())
+                .testTitle(testTitle)
+                .resultScore(result.getResultScore())
+                .resultDate(result.getResultDate())
+                .build();
+    }
+
+		/* method : testId에 해당하는 testTitle리턴 */
+		private String findTestTitle(Long testId) {
+        try {
+            return testRepository.findById(testId).get().getTestTitle();
+        } catch (Exception e) {
+            return "존재하지 않는 테스트입니다";
+        }
+    }
+}
+
+***
+
+3. Controller → page를 받아서 Pageable 설정하여 service 사용
+package com.timekiller.zzatool.result.control;
+
+import com.timekiller.zzatool.result.dto.ResultDTO;
+import com.timekiller.zzatool.result.service.ResultServiceImpl;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.*;
+
+@Slf4j
+@RestController
+@RequestMapping("/result")
+public class ResultController {
+    @Autowired private ResultServiceImpl resultService;
+
+    /* 임시 컨트롤러 */
+    @GetMapping("/{memberId}/{page}")
+    public Page<ResultDTO> myResultList(
+            @PathVariable("memberId") Long memberId, @PathVariable("page") Integer page)
+            throws Exception {
+        try {
+            Pageable pageable = PageRequest.of(page - 1, 20);
+            return resultService.findResultListByMemberId(memberId, pageable);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+}
